@@ -40,7 +40,7 @@ def estimateGas(tx):
     )
     gas = gas + (gas / 10)
     estimateGasInBNB = Web3.fromWei(gas * web3.eth.gas_price, 'ether')
-    print(f'預計交易費用: {estimateGasInBNB:.8f} BNB')
+    print(f'Estimated gas fee: {estimateGasInBNB:.8f} BNB')
     return gas
 
 
@@ -49,7 +49,7 @@ def getPlayerData(walletAddress):
         walletAddress
     ).call()
     if len(rawPlayerData) == 0:
-        print('找不到可用的玩家')
+        print('Unable to find avaliable player.')
         sys.exit()
     playerIdList = [i[0] for i in rawPlayerData]
     cdTimestamp = max([i[6] for i in rawPlayerData])
@@ -68,7 +68,7 @@ def pickGame(walletAddress):
             if i[-1] and i[-2] and i[-3]:
                 return i[0]
     else:
-        print('找不到可遊玩的遊戲')
+        print('Unable to find avaliable game.')
         sys.exit()
 
 
@@ -85,34 +85,34 @@ def playGame(gameIndex, playerId):
     tx = web3.eth.sendRawTransaction(signedTx.rawTransaction)
     txHash = web3.toHex(tx)
 
-    print(f'交易 ID: {txHash}')
-    print('等待交易確認...')
+    print(f'Transaction ID: {txHash}')
+    print('Waiting for confirmation...')
     txReceipt = web3.eth.waitForTransactionReceipt(txHash, 60)
     return txReceipt
 
 
 def bswLoop():
     walletBalance = web3.fromWei(web3.eth.get_balance(walletAddress), 'ether')
-    print(f'錢包餘額: {walletBalance:.4f} BNB')
+    print(f'Wallet balance: {walletBalance:.4f} BNB')
 
     rewardBalance = getRewardBalance(walletAddress)
     bswBalance = web3.fromWei(rewardBalance[0], 'ether')
     bnbBalance = web3.fromWei(rewardBalance[1], 'ether')
-    print(f'收入餘額: {bswBalance:.4f} BSW, {bnbBalance:.4f} BNB')
+    print(f'Reward balance: {bswBalance:.4f} BSW, {bnbBalance:.4f} BNB')
 
     playerIdList, cdTimestamp = getPlayerData(walletAddress)
     cdStr = datetime.fromtimestamp(cdTimestamp)
-    print(f'冷卻時間: {cdStr}')
+    print(f'Cooldown: {cdStr}')
 
     while True:
         currentTimestamp = int(time.time())
 
         if currentTimestamp > (cdTimestamp + 2 * 60):
-            print('冷卻時間已過，正在進行遊戲...')
+            print('Cooldown expired. Trying to play a game...')
             gameIndex = pickGame(walletAddress)
             txReceipt = playGame(gameIndex, playerIdList)
             if not txReceipt['status']:
-                print('交易失敗')
+                print('Transaction failed.')
                 sys.exit()
 
             txLog = txReceipt['logs'][-1]['data']
@@ -120,9 +120,9 @@ def bswLoop():
             bnbReward = web3.fromWei(web3.toInt(hexstr=txLog[-64:]), 'ether')
 
             if max(bnbReward, bswReward) > 0:
-                print(f'獲得 {bswReward:.4f} BSW, {bnbReward:.4f} BNB')
+                print(f'You won {bswReward:.4f} BSW, {bnbReward:.4f} BNB.')
             else:
-                print('沒有獲得任何獎勵')
+                print('You did not win anything.')
 
             break
 
@@ -130,31 +130,31 @@ def bswLoop():
 
 
 def createPassphrase():
-    passphrase = pwinput.pwinput(prompt='新密碼: ')
-    confirmPassphrase = pwinput.pwinput(prompt='確認密碼: ')
+    passphrase = pwinput.pwinput(prompt='Password: ')
+    confirmPassphrase = pwinput.pwinput(prompt='Confirm password: ')
     if passphrase != confirmPassphrase:
-        print('密碼不相符，請重新輸入')
+        print('Passwords do not match. Please try again.')
         return createPassphrase()
     else:
         return passphrase
 
 
 def decryptPrivateKey():
-    passphrase = pwinput.pwinput(prompt='請輸入你的密碼: ')
+    passphrase = pwinput.pwinput(prompt='Please enter your password: ')
     privateKey = cryptocode.decrypt(walletPrivateKey, passphrase)
     if not privateKey:
-        print('密碼錯誤，請重新輸入')
+        print('Passwords do not match. Please try again.')
         return decryptPrivateKey()
     else:
         return privateKey
 
 
 if __name__ == '__main__':
-    print(f'正在使用錢包: {walletAddress}')
+    print(f'Now using wallet: {walletAddress}')
 
     if walletPrivateKey == '':
-        walletPrivateKey = pwinput.pwinput(prompt='請輸入你的私鑰: ')
-        print('請建立一組密碼以加密你的私鑰')
+        walletPrivateKey = pwinput.pwinput(prompt='Please enter your private key: ')
+        print('Please enter a password to encrypt your private key.')
         passphrase = createPassphrase()
         encryptedPrivateKey = cryptocode.encrypt(walletPrivateKey, passphrase)
         config['walletPrivateKey'] = encryptedPrivateKey

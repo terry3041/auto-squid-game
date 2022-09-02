@@ -1,34 +1,26 @@
 # auto-squid-game
 
-自動烤魷魚腳本會偵測所有持有合約的玩家的魷魚能量，並自動進行遊戲。
+**Outdated, for V1 only**   
+auto-squid-game will detect the Squid Energy (SE) of the Players you owned, and enter a game automatically.
 
-## 開始使用
+## Getting Started
 
-### 環境需求
+### Prerequisites
 
 -   [Python 3.6+](https://www.python.org/downloads/)
 
-### 安裝方式
+### Installation
 
-若要執行 auto-squid-game，需要安裝額外的套件，使用終端機至此專案的資料夾中執行此指令：
+To run auto-squid-game, you need to install libraries inside `requirements.txt`.
 
 ```
 pip install -r requirements.txt
 ```
 
-### 設定
+### Configuration
 
-用任意的文字編輯器開啟 `config.json`，在
-
-```
-{
-    "walletAddress": "",
-    "walletPrivateKey": ""
-}
-```
-
-**只填入 MetaMask 錢包的地址**，如下：  
-(腳本會在首次運行時提示你創建密碼以加密私鑰)
+Open `config.json` and **fill in the MetaMask address only**.  
+(The script will prompt you to enter a password to encrypt the private key.)
 
 ```
 {
@@ -37,16 +29,10 @@ pip install -r requirements.txt
 }
 ```
 
-### 使用方式
+### Usage
 
-使用終端機至專案資料夾執行此指令：
+Run auto-squid-game by running the below command in terminal.
 
 ```
 python main.py
 ```
-
-## 抖內 へ(´д ｀へ)
-
-### 小弟的錢包
-
-`0x96D99BB2bC9694310Dbc2ae63253a23E75C275eE`
